@@ -1,0 +1,16 @@
+<html>
+ <head>
+  <script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
+<link rel="stylesheet" href="https://rawgit.com/enyo/dropzone/master/dist/dropzone.css">
+  </head>
+ <body>
+  <h1>Here you can create your own album</h1>
+  <form class="dropzone" id="dropzoneForm" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+   <input type="file" name="file"/>
+   <button type="submit">{{ uploadButtonName }}</button>
+  </form>
+  <script type="text/javascript">
+   var myDropzone = new Dropzone("#dropzoneForm", { url: "{{ url_for('upload') }}"});
+  </script>
+ </body>
+</html>
