@@ -1,0 +1,32 @@
+---
+- hosts: webui
+  vars:
+    - os_packages:
+        - git
+    - python_packages:
+        - Flask
+        - boto3
+  tasks:
+    - name: "Upload .ssh config"
+      template:
+        src: "templates/ssh_config"
+        dest: "~/.ssh/config"
+        mode: 0600
+    - name: "Update AWS config"
+      file: dest=~/.aws state=directory
+    - template:
+        src: "templates/aws_config"
+        dest: "~/.aws/config"
+    - name: "install common dependencies"
+      yum: name={{item}}
+      with_items: "{{os_packages}}"
+      become: yes
+    - name: "install python dependencies"
+      pip: name={{item}}
+      with_items: "{{python_packages}}"
+      become: yes
+    - name: "synchronize repository"
+      git:
+        repo: http://gitlab.kni.uek.krakow.pl/wpc/upload-web-interface.git
+        dest: ~/photoAlbumUi
+        accept_hostkey: true
