@@ -2,6 +2,7 @@
  <head>
     <title>UEK</title>
 
+   <script src="/static/assets/js/jquery.min.js"></script>
    <script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
    <script src="/static/assets/js/bootstrap.min.js"></script>
 
@@ -22,7 +23,16 @@
       var myDropzone = new Dropzone("div#dropzoneBox", {
         init: function() {
             this.on('removedfile', function(file) {
-                console.log(file);
+                var data = {
+                    filename: file.name
+                };
+
+                $.ajax({
+                  url: 'remove-file',
+                  method: 'POST',
+                  data: JSON.stringify(data),
+                  contentType: 'application/json;charset=UTF-8',
+                })
             });
         },
         url: '/upload',
