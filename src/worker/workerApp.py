@@ -1,10 +1,11 @@
-import boto3
 import time
 from cStringIO import StringIO
-import mailer as mailer
+
+import boto3
 from jinja2 import Environment, FileSystemLoader
 from xhtml2pdf import pisa
-import config
+
+from src import config
 
 sqs = boto3.resource('sqs')
 albums = sqs.get_queue_by_name(QueueName='arek-album')

@@ -1,9 +1,0 @@
----
-- hosts: main
-  tasks:
-  - name: "Install Git client"
-    yum: name=git state=latest
-  - name: "Retrive repository"
-    git:
-      repo=https://github.com/Albert91/amazon-webservices.git
-      dest=~/amazon-webservices
