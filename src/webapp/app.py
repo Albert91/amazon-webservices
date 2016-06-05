@@ -17,9 +17,9 @@ def upload():
     files = request.files
     for f in files.getlist('file'):
         print(f)
-        upload_s3(f)
+        # upload_s3(f)
         filename = f.filename
-        updir = '/home/ec2-user/photoAlbumUi/upload'
+        updir = '/var/www/amazon-webservices/upload'
         f.save(os.path.join(updir, filename))
     return jsonify()
 
@@ -30,7 +30,6 @@ def upload_s3(source_file):
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(bucket_name)
     bucket.put_object(Key=destination_filename, Body=source_file)
-
 
 if __name__ == "__main__":
     app.run(debug=True)

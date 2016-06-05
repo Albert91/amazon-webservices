@@ -1,16 +1,35 @@
 <html>
  <head>
-  <script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
-<link rel="stylesheet" href="https://rawgit.com/enyo/dropzone/master/dist/dropzone.css">
-  </head>
- <body>
-  <h1>Here you can create your own album</h1>
-  <form class="dropzone" id="dropzoneForm" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
-   <input type="file" name="file"/>
-   <button type="submit">{{ uploadButtonName }}</button>
+    <title>UEK</title>
+
+   <script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
+   <script src="/static/assets/js/bootstrap.min.js"></script>
+
+   <link rel="stylesheet" href="https://rawgit.com/enyo/dropzone/master/dist/dropzone.css">
+   <link rel="stylesheet" href="/static/assets/css/bootstrap.min.css">
+   <link rel="stylesheet" href="/static/assets/css/bootstrap-theme.min.css">
+   <link rel="stylesheet" href="/static/assets/css/main.css">
+ </head>
+ <body class="container">
+  <h1>Try it out!</h1>
+  <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+      <div class="dropzone" id="dropzoneBox"></div>
+      <button class="bar-button btn-primary" type="submit">{{ uploadButtonName }}</button>
   </form>
+
   <script type="text/javascript">
-   var myDropzone = new Dropzone("#dropzoneForm", { url: "{{ url_for('upload') }}"});
+      Dropzone.autoDiscover = false;
+      var myDropzone = new Dropzone("div#dropzoneBox", {
+        init: function() {
+            this.on('removedfile', function(file) {
+                console.log(file);
+            });
+        },
+        url: '/upload',
+        maxFilesize: 2,
+        addRemoveLinks: true,
+        acceptedFiles: '.jpeg, .jpg, .png, .gif'
+      });
   </script>
  </body>
 </html>
