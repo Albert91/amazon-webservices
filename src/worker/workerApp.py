@@ -40,7 +40,7 @@ def _send_email(mailer, recipient, photo_urls):
 
 while True:
     for album in albums.receive_messages():
-        sqs_object = json.load(album)
+        sqs_object = json.load(album.body)
         pdf = _create_pdf(_generate_html(sqs_object['photos']))
         _send_email(sqs_object['email'], pdf)
         album.delete()
