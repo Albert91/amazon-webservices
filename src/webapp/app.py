@@ -1,4 +1,4 @@
-import os
+import json, os
 from uuid import uuid4
 
 import boto3
@@ -6,31 +6,64 @@ from flask import Flask, render_template, jsonify, request
 
 app = Flask(__name__)
 
+BUCKET_NAME = '159319-arek'
+SQS_NAME = 'arek-album'
 
-@app.route("/")
+
+@app.route('/')
 def index():
-    return render_template('upload_form.html', uploadButtonName="send")
+    return render_template('upload_form.html', uuid=uuid4().hex)
 
 
-@app.route("/upload", methods=['POST'])
+@app.route('/upload', methods=['POST'])
 def upload():
     files = request.files
+    uuid = request.form['uuid']
+
     for f in files.getlist('file'):
-        print(f)
-        upload_s3(f)
-        filename = f.filename
-        updir = '/home/ec2-user/photoAlbumUi/upload'
-        f.save(os.path.join(updir, filename))
+        upload_s3(f, uuid)
+
     return jsonify()
 
 
-def upload_s3(source_file):
-    bucket_name = '153412-kkanclerz'
-    destination_filename = "photos/%s/%s" % (uuid4().hex, source_file.filename)
+def upload_s3(source_file, uuid):
+    destination_filename = 'photos/%s/%s' % (uuid, source_file.filename)
+
     s3 = boto3.resource('s3')
-    bucket = s3.Bucket(bucket_name)
+    bucket = s3.Bucket(BUCKET_NAME)
     bucket.put_object(Key=destination_filename, Body=source_file)
 
 
-if __name__ == "__main__":
+@app.route('/remove-file', methods=['POST'])
+def remove_file():
+    object_key = 'photos/%s/%s' % (request.form['uuid'], request.form['filename'])
+
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(BUCKET_NAME)
+    bucket.delete_object(object_key)
+
+    return jsonify()
+
+
+@app.route('/create-album', methods=['POST'])
+def create_album():
+    sqs = boto3.resource('sqs')
+    queue = sqs.get_queue_by_name(QueueName=SQS_NAME)
+
+    sqs_object = {
+        'email': request.json['email'],
+        'photos': []
+    }
+
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(BUCKET_NAME)
+
+    objects_list = list(bucket.list('photos/' + request.json['uuid'], '/'))
+    sqs_object['photos'] = objects_list
+
+    response = queue.send_message(MessageBody=json.dumps(sqs_object))
+
+    return jsonify()
+
+if __name__ == '__main__':
     app.run(debug=True)
