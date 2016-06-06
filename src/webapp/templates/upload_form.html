@@ -2,11 +2,13 @@
  <head>
     <title>UEK</title>
 
-   <script src="/static/assets/js/jquery.min.js"></script>
+   <script src="/static/assets/js/jquery-2.2.4.min.js"></script>
    <script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
+   <script src="/static/assets/js/toastr.min.js"></script>
    <script src="/static/assets/js/bootstrap.min.js"></script>
 
    <link rel="stylesheet" href="https://rawgit.com/enyo/dropzone/master/dist/dropzone.css">
+   <link rel="stylesheet" href="/static/assets/css/toastr.min.css">
    <link rel="stylesheet" href="/static/assets/css/bootstrap.min.css">
    <link rel="stylesheet" href="/static/assets/css/bootstrap-theme.min.css">
    <link rel="stylesheet" href="/static/assets/css/main.css">
@@ -14,16 +16,30 @@
  <body class="container">
   <h1>Try it out!</h1>
   <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input type="hidden" name="uuid" value="{{ uuid }}">
+        <input type="email" class="form-control" id="email" placeholder="Email">
+      </div>
+
       <div class="dropzone" id="dropzoneBox"></div>
-      <button class="bar-button btn-primary" type="submit">{{ uploadButtonName }}</button>
+
+      <button class="bar-button btn-primary" type="submit">Create album</button>
   </form>
 
   <script type="text/javascript">
       Dropzone.autoDiscover = false;
+      var uuid = $('input[name="uuid"]').val();
+
       var myDropzone = new Dropzone("div#dropzoneBox", {
         init: function() {
+            this.on('sending', function(file, xhr, formData){
+                formData.append('uuid', uuid);
+            });
+
             this.on('removedfile', function(file) {
                 var data = {
+                    uuid: uuid,
                     filename: file.name
                 };
 
@@ -39,6 +55,35 @@
         maxFilesize: 2,
         addRemoveLinks: true,
         acceptedFiles: '.jpeg, .jpg, .png, .gif'
+      });
+
+      var submitButton = $('button[type="submit"]')
+      submitButton.on('click', function(e) {
+        e.preventDefault();
+
+        var email = $('#email').val();
+        if(!email) {
+            toastr.error('Please provide email');
+
+            return;
+        }
+
+        $('div[role="alert"]').hide();
+        var data = {
+            email: email,
+            uuid: uuid
+        };
+
+        $.ajax({
+          url: 'create-album',
+          method: 'POST',
+          data: JSON.stringify(data),
+          contentType: 'application/json;charset=UTF-8'
+        }).done(function() {
+            toastr.success('Album added to queue');
+        }).fail(function() {
+            toastr.error('Unexpected error while creating album');
+        });
       });
   </script>
  </body>
