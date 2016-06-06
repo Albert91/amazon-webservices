@@ -6,7 +6,7 @@
     - python_packages:
         - Flask
         - boto3
-    - project_name: "photoAlbumUi"
+    - project_name: "goPhoto"
   tasks:
     - name: "Upload .ssh config"
       template:
@@ -29,10 +29,10 @@
     - name: "Synchronize repository"
       git:
         repo: https://github.com/Albert91/amazon-webservices.git
-        dest: ~/photoAlbumUi
+        dest: ~/{{project_name}}
         accept_hostkey: true
     - name: "Upload worker app config file"
       template:
         src: "~/config.py"
-        dest: "~/{{ photoAlbumUi }}/src/config.py"
+        dest: "~/{{project_name}}/src/worker/config.py"
         mode: 0600

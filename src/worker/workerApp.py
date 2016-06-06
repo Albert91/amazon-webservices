@@ -1,12 +1,12 @@
-import time
 import json
+import time
 from cStringIO import StringIO
 
 import boto3
 from jinja2 import Environment, FileSystemLoader
 from xhtml2pdf import pisa
 
-from src import config
+import config
 
 sqs = boto3.resource('sqs')
 albums = sqs.get_queue_by_name(QueueName=config.QUEUE_NAME)
