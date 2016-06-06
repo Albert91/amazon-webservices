@@ -43,4 +43,6 @@ while True:
         sqs_object = json.load(album)
         pdf = _create_pdf(_generate_html(sqs_object['photos']))
         _send_email(sqs_object['email'], pdf)
+        album.delete()
+
     time.sleep(1)
