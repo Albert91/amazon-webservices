@@ -15,7 +15,7 @@
  </head>
  <body class="container">
   <h1>Try it out!</h1>
-  <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+  <form action="{{ url_for('create_album') }}" method="POST" enctype="multipart/form-data">
       <div class="form-group">
         <label for="email">Email address</label>
         <input type="hidden" name="uuid" value="{{ uuid }}">
@@ -28,6 +28,14 @@
   </form>
 
   <script type="text/javascript">
+      var createInput = function(count, path) {
+       	 var input = '<input type="hidden" class="photo" name="__photo_url__" value="__value__"/>"'
+         input = input.replace('__photo_url__', count);
+         input = input.replace('__value__',  path);
+
+       	 return	input;
+      }
+
       Dropzone.autoDiscover = false;
       var uuid = $('input[name="uuid"]').val();
 
@@ -54,7 +62,16 @@
         url: '/upload',
         maxFilesize: 2,
         addRemoveLinks: true,
-        acceptedFiles: '.jpeg, .jpg, .png, .gif'
+        acceptedFiles: '.jpeg, .jpg, .png, .gif',
+        success: function(file, response) {
+            console.log(response);
+            var photosCount = $('.requestAlbumForm input.photo').length;
+
+            response.photos.forEach(function(photo) {
+                var input = createInput(photosCount, photo);
+                $('.requestAlbumForm').append($(input));
+            });
+        }
       });
 
       var submitButton = $('button[type="submit"]')
@@ -69,21 +86,6 @@
         }
 
         $('div[role="alert"]').hide();
-        var data = {
-            email: email,
-            uuid: uuid
-        };
-
-        $.ajax({
-          url: 'create-album',
-          method: 'POST',
-          data: JSON.stringify(data),
-          contentType: 'application/json;charset=UTF-8'
-        }).done(function() {
-            toastr.success('Album added to queue');
-        }).fail(function() {
-            toastr.error('Unexpected error while creating album');
-        });
       });
   </script>
  </body>
