@@ -15,7 +15,7 @@
  </head>
  <body class="container">
   <h1>Try it out!</h1>
-  <form action="{{ url_for('create_album') }}" method="POST" enctype="multipart/form-data">
+  <form id="createAlbumForm" action="{{ url_for('create_album') }}" method="POST" enctype="multipart/form-data">
       <div class="form-group">
         <label for="email">Email address</label>
         <input type="hidden" name="uuid" value="{{ uuid }}">
@@ -69,7 +69,7 @@
 
             response.photos.forEach(function(photo) {
                 var input = createInput(photosCount, photo);
-                $('.requestAlbumForm').append($(input));
+                $('#createAlbumForm').append($(input));
             });
         }
       });
