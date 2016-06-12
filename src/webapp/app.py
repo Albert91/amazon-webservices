@@ -1,13 +1,12 @@
-import json, os
+import json
 from uuid import uuid4
 
 import boto3
 from flask import Flask, render_template, jsonify, request
 
 app = Flask(__name__)
-
+QUEUE_NAME = 'arek-album'
 BUCKET_NAME = '159319-arek'
-SQS_NAME = 'arek-album'
 
 
 @app.route('/')
@@ -48,7 +47,7 @@ def remove_file():
 @app.route('/create-album', methods=['POST'])
 def create_album():
     sqs = boto3.resource('sqs')
-    queue = sqs.get_queue_by_name(QueueName=SQS_NAME)
+    queue = sqs.get_queue_by_name(QueueName=QUEUE_NAME)
 
     sqs_object = {
         'email': request.json['email'],
@@ -65,5 +64,6 @@ def create_album():
 
     return jsonify()
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=80)
