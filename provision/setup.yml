@@ -1,5 +1,5 @@
 ---
-- hosts: webui
+- hosts: common
   vars:
     - os_packages:
         - git
