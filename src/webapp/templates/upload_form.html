@@ -29,8 +29,8 @@
 
   <script type="text/javascript">
       var createInput = function(count, path) {
-       	 var input = '<input type="hidden" class="photo" name="__photo_url__" value="__value__"/>"'
-         input = input.replace('__photo_url__', count);
+       	 var input = '<input type="hidden" class="photo" name="photos___number__" value="__value__"/>"'
+         input = input.replace('__number__', count);
          input = input.replace('__value__',  path);
 
        	 return	input;
