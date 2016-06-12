@@ -18,16 +18,20 @@ def index():
 def upload():
     files = request.files
     uuid = request.form['uuid']
+    album = {
+        'photos': []
+    }
 
     for f in files.getlist('file'):
-        upload_s3(f, uuid)
+        destination_filename = 'photos/%s/%s' % (uuid, f.filename)
 
-    return jsonify()
+        album['photos'].append(destination_filename)
+        upload_s3(f, destination_filename)
+
+    return jsonify(album)
 
 
-def upload_s3(source_file, uuid):
-    destination_filename = 'photos/%s/%s' % (uuid, source_file.filename)
-
+def upload_s3(source_file, destination_filename):
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(BUCKET_NAME)
     bucket.put_object(Key=destination_filename, Body=source_file)
@@ -46,21 +50,21 @@ def remove_file():
 
 @app.route('/create-album', methods=['POST'])
 def create_album():
-    sqs = boto3.resource('sqs')
-    queue = sqs.get_queue_by_name(QueueName=QUEUE_NAME)
+    photos_count = len(request.form)
+    photos_urls = []
+
+    for index in range(0, photos_count - 1):
+        key = 'photos_%s' % index
+        photos_urls.append(request.form[key])
 
     sqs_object = {
-        'email': request.json['email'],
-        'photos': []
+        'email': request.form['email'],
+        'photos': photos_urls
     }
 
-    s3 = boto3.resource('s3')
-    bucket = s3.Bucket(BUCKET_NAME)
-
-    objects_list = list(bucket.list('photos/' + request.json['uuid'], '/'))
-    sqs_object['photos'] = objects_list
-
-    response = queue.send_message(MessageBody=json.dumps(sqs_object))
+    sqs = boto3.resource('sqs')
+    queue = sqs.get_queue_by_name(QueueName=QUEUE_NAME)
+    queue.send_message(MessageBody=json.dumps(sqs_object))
 
     return jsonify()
 
