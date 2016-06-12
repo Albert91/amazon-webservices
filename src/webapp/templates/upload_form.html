@@ -76,16 +76,13 @@
 
       var submitButton = $('button[type="submit"]')
       submitButton.on('click', function(e) {
-        e.preventDefault();
-
         var email = $('#email').val();
         if(!email) {
+            e.preventDefault();
             toastr.error('Please provide email');
 
             return;
         }
-
-        $('div[role="alert"]').hide();
       });
   </script>
  </body>
