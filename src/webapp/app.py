@@ -53,8 +53,8 @@ def create_album():
     photos_count = len(request.form)
     photos_urls = []
 
-    for index in range(0, photos_count - 1):
-        key = 'photos_%s' % index
+    for i in range(0, photos_count - 2):
+        key = 'photos_%s' % i
         photos_urls.append(request.form[key])
 
     sqs_object = {
@@ -70,4 +70,4 @@ def create_album():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=5000)
