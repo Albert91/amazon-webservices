@@ -66,7 +66,7 @@ def create_album():
     queue = sqs.get_queue_by_name(QueueName=QUEUE_NAME)
     queue.send_message(MessageBody=json.dumps(sqs_object))
 
-    return jsonify()
+    return render_template('thank_you.html')
 
 
 if __name__ == '__main__':
