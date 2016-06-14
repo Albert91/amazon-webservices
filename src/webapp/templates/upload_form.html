@@ -45,27 +45,12 @@
             this.on('sending', function(file, xhr, formData){
                 formData.append('uuid', uuid);
             });
-
-            this.on('removedfile', function(file) {
-                var data = {
-                    uuid: uuid,
-                    filename: file.name
-                };
-
-                $.ajax({
-                  url: 'remove-file',
-                  method: 'POST',
-                  data: JSON.stringify(data),
-                  contentType: 'application/json;charset=UTF-8',
-                })
-            });
         },
         url: '/upload',
         maxFilesize: 2,
         addRemoveLinks: true,
         acceptedFiles: '.jpeg, .jpg, .png, .gif',
         success: function(file, response) {
-            console.log(response);
             var photosCount = $('.requestAlbumForm input.photo').length;
 
             response.photos.forEach(function(photo) {

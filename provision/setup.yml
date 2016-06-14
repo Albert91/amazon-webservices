@@ -13,11 +13,6 @@
         - xhtml2pdf
     - project_name: "goPhoto"
   tasks:
-    - name: "Upload .ssh config"
-      template:
-        src: "templates/ssh_config"
-        dest: "~/.ssh/config"
-        mode: 0600
     - name: "Update AWS config"
       file: dest=~/.aws state=directory
     - template:

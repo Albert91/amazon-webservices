@@ -7,6 +7,7 @@ from flask import Flask, render_template, jsonify, request
 app = Flask(__name__)
 QUEUE_NAME = 'arek-album'
 BUCKET_NAME = '159319-arek'
+BUCKET_ADDRESS = 'https://s3.eu-central-1.amazonaws.com/159319-arek'
 
 
 @app.route('/')
@@ -24,8 +25,9 @@ def upload():
 
     for f in files.getlist('file'):
         destination_filename = 'photos/%s/%s' % (uuid, f.filename)
+        photo_url = '%s/%s' % (BUCKET_ADDRESS, destination_filename)
 
-        album['photos'].append(destination_filename)
+        album['photos'].append(photo_url)
         upload_s3(f, destination_filename)
 
     return jsonify(album)
@@ -34,18 +36,7 @@ def upload():
 def upload_s3(source_file, destination_filename):
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(BUCKET_NAME)
-    bucket.put_object(Key=destination_filename, Body=source_file)
-
-
-@app.route('/remove-file', methods=['POST'])
-def remove_file():
-    object_key = 'photos/%s/%s' % (request.form['uuid'], request.form['filename'])
-
-    s3 = boto3.resource('s3')
-    bucket = s3.Bucket(BUCKET_NAME)
-    bucket.delete_object(object_key)
-
-    return jsonify()
+    bucket.put_object(Key=destination_filename, Body=source_file, ACL='public-read')
 
 
 @app.route('/create-album', methods=['POST'])
