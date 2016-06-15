@@ -45,8 +45,14 @@ def _send_email(recipient, photo_urls):
         _generate_html(photo_urls)).getvalue())
     part.add_header('Content-Disposition', 'attachment', filename="album.pdf")
     msg.attach(part)
-    client.send_raw_email(msg.as_string(), source=msg['From'], destinations=[recipient])
 
+    response = client.send_raw_email(
+        RawMessage={'Data': msg.as_string()},
+        Source=msg['From'],
+        Destinations=[recipient]
+    )
+
+    return response
 
 while True:
     for album in albums.receive_messages():
