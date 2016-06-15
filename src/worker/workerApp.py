@@ -18,9 +18,9 @@ session = boto3.session.Session()
 client = session.client('ses', region_name='eu-west-1')
 
 def _create_pdf(pdf_data):
-    stream = StringIO()
-    pisa.CreatePDF(StringIO(pdf_data.encode('utf-8')))
-    return stream
+    pdf = StringIO()
+    pisa.CreatePDF(StringIO(pdf_data.encode('utf-8')), pdf)
+    return pdf
 
 
 def _generate_html(photos):
@@ -35,7 +35,7 @@ def _generate_html(photos):
 def _send_email(recipient, photo_urls):
     msg = MIMEMultipart()
     msg['Subject'] = 'Email subject'
-    msg['From'] = 'me@example.com'
+    msg['From'] = 'skala.pawel@gmail.com'
     msg['To'] = recipient
 
     part = MIMEText('Here is yours Album!')
@@ -45,7 +45,14 @@ def _send_email(recipient, photo_urls):
         _generate_html(photo_urls)).getvalue())
     part.add_header('Content-Disposition', 'attachment', filename="album.pdf")
     msg.attach(part)
-    client.send_raw_email(msg.as_string(), source=msg['From'], destinations=recipient)
+    client.send_raw_email(
+        msg.as_string(),
+        Source=msg['From'],
+        Destination={
+            'ToAddresses': [
+                recipient,
+            ]
+        })
 
 
 while True:
