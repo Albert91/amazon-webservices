@@ -45,14 +45,7 @@ def _send_email(recipient, photo_urls):
         _generate_html(photo_urls)).getvalue())
     part.add_header('Content-Disposition', 'attachment', filename="album.pdf")
     msg.attach(part)
-    client.send_raw_email(
-        msg.as_string(),
-        Source=msg['From'],
-        Destination={
-            'ToAddresses': [
-                recipient,
-            ]
-        })
+    client.send_raw_email(msg.as_string(), source=msg['From'], destinations=[recipient])
 
 
 while True:
