@@ -1,5 +1,6 @@
 import json
 import time
+import os
 from cStringIO import StringIO
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
@@ -23,8 +24,12 @@ def _create_pdf(pdf_data):
 
 
 def _generate_html(photos):
-    template = Environment(loader=FileSystemLoader('templates')).get_template('pdf_template.html')
-    return template.render(photos=photos)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    template = Environment(loader=FileSystemLoader(current_dir))
+
+    return template.get_template('templates/pdf_template.html').render(
+        photos=photos
+    )
 
 
 def _send_email(recipient, photo_urls):
